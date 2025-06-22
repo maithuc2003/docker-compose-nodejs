@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  user_service:
+    image: maithuc2003/user_service:latest
+    ports:
+      - "3000:3000" # giữ cứng vì không cần bảo mật
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      - user_db
+
+  user_db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3306:3306" # giữ cố định để tránh lỗi kết nối
+    volumes:
+      - ./init/users.sql:/docker-entrypoint-initdb.d/users.sql
