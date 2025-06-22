@@ -15,7 +15,7 @@ pipeline {
     stage('Build Docker image') {
       steps {
         script {
-          sh 'docker build -t $DOCKER_IMAGE .'
+          bat "docker build -t %DOCKER_IMAGE% ."
         }
       }
     }
@@ -23,9 +23,9 @@ pipeline {
     stage('Push to Docker Hub') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'DOCKERHUB', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh '''
-            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            docker push $DOCKER_IMAGE
+          bat '''
+            echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+            docker push %DOCKER_IMAGE%
           '''
         }
       }
@@ -34,7 +34,7 @@ pipeline {
     stage('Run with Docker Compose') {
       steps {
         configFileProvider([configFile(fileId: 'env_user_service', targetLocation: '.env')]) {
-          sh '''
+          bat '''
             docker-compose --env-file .env pull
             docker-compose --env-file .env up -d --remove-orphans
           '''
